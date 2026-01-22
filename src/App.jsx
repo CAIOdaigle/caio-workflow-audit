@@ -1,7 +1,9 @@
 import { useState, useCallback } from 'react';
 import { useLocalStorage } from './hooks/useLocalStorage';
+import { useToast } from './hooks/useToast';
 import { generateSampleData } from './data/sampleData';
 import { Header } from './components/Layout/Header';
+import { ToastContainer } from './components/Toast/Toast';
 import { WelcomeScreen } from './pages/WelcomeScreen';
 import { TimeEntryPage } from './pages/TimeEntryPage';
 import { ReviewPage } from './pages/ReviewPage';
@@ -11,6 +13,16 @@ import { SummaryPage } from './pages/SummaryPage';
 function App() {
   const [currentStep, setCurrentStep] = useState('welcome');
   const [editingEntry, setEditingEntry] = useState(null);
+  const toast = useToast();
+
+  // Handle storage errors with toast notifications
+  const handleStorageError = useCallback((type, message) => {
+    if (type === 'error') {
+      toast.error(message);
+    } else if (type === 'warning') {
+      toast.warning(message);
+    }
+  }, [toast]);
 
   const {
     entries,
@@ -22,7 +34,7 @@ function App() {
     updateReflections,
     markComplete,
     clearAllData
-  } = useLocalStorage();
+  } = useLocalStorage(handleStorageError);
 
   const hasExistingData = entries.length > 0;
 
@@ -43,6 +55,7 @@ function App() {
     const sampleData = generateSampleData();
     setEntries(sampleData);
     setCurrentStep('entry');
+    toast.success('Sample data loaded successfully!');
   };
 
   const handleEditFromReview = (entry) => {
@@ -52,22 +65,40 @@ function App() {
 
   const handleComplete = () => {
     markComplete();
-    // In a real app, this might redirect to the next lesson
-    alert('Audit completed! Your data has been saved.');
+    toast.success('Audit completed! Your data has been saved.');
   };
 
   const handleClearAll = () => {
     clearAllData();
+    toast.info('All entries have been cleared.');
+  };
+
+  const handleAddEntry = (entry) => {
+    addEntry(entry);
+    toast.success('Entry added successfully!');
+  };
+
+  const handleUpdateEntry = (id, updates) => {
+    updateEntry(id, updates);
+    toast.success('Entry updated successfully!');
+  };
+
+  const handleDeleteEntry = (id) => {
+    deleteEntry(id);
+    toast.info('Entry deleted.');
   };
 
   // Welcome screen (no header)
   if (currentStep === 'welcome') {
     return (
-      <WelcomeScreen
-        onStart={handleStart}
-        onLoadSample={handleLoadSample}
-        hasExistingData={hasExistingData}
-      />
+      <>
+        <WelcomeScreen
+          onStart={handleStart}
+          onLoadSample={handleLoadSample}
+          hasExistingData={hasExistingData}
+        />
+        <ToastContainer toasts={toast.toasts} removeToast={toast.removeToast} />
+      </>
     );
   }
 
@@ -82,9 +113,9 @@ function App() {
       {currentStep === 'entry' && (
         <TimeEntryPage
           entries={entries}
-          onAddEntry={addEntry}
-          onUpdateEntry={updateEntry}
-          onDeleteEntry={deleteEntry}
+          onAddEntry={handleAddEntry}
+          onUpdateEntry={handleUpdateEntry}
+          onDeleteEntry={handleDeleteEntry}
           onClearAll={handleClearAll}
           onContinue={() => setCurrentStep('review')}
           editingEntry={editingEntry}
@@ -95,7 +126,7 @@ function App() {
         <ReviewPage
           entries={entries}
           onEdit={handleEditFromReview}
-          onDelete={deleteEntry}
+          onDelete={handleDeleteEntry}
           onBack={() => setCurrentStep('entry')}
           onContinue={() => setCurrentStep('reflect')}
         />
@@ -119,6 +150,8 @@ function App() {
           onBack={() => setCurrentStep('reflect')}
         />
       )}
+
+      <ToastContainer toasts={toast.toasts} removeToast={toast.removeToast} />
     </div>
   );
 }

@@ -151,22 +151,35 @@ export const TimeEntryPage = ({
 
       {/* Clear Confirmation Modal */}
       {showClearConfirm && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl max-w-md w-full p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Clear All Entries?</h3>
-            <p className="text-gray-600 mb-6">
+        <div
+          className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="clear-dialog-title"
+          aria-describedby="clear-dialog-description"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setShowClearConfirm(false);
+            }
+          }}
+        >
+          <div className="bg-white rounded-xl max-w-md w-full p-6" role="document">
+            <h3 id="clear-dialog-title" className="text-lg font-semibold text-gray-900 mb-2">
+              Clear All Entries?
+            </h3>
+            <p id="clear-dialog-description" className="text-gray-600 mb-6">
               This will delete all {entries.length} time entries. This action cannot be undone.
             </p>
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => setShowClearConfirm(false)}
-                className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500"
               >
                 Cancel
               </button>
               <button
                 onClick={handleClearAll}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500"
               >
                 Clear All
               </button>

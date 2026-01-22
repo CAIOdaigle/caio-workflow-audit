@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { format, subDays } from 'date-fns';
 import { X, Plus, Clock } from 'lucide-react';
@@ -45,6 +45,9 @@ export const EntryForm = ({ onSubmit, onCancel, editingEntry = null }) => {
     if (!formData.activity.trim()) {
       newErrors.activity = 'Activity description is required';
     }
+    if (formData.activity.length > 500) {
+      newErrors.activity = 'Activity description must be less than 500 characters';
+    }
     if (!isValidDuration) {
       newErrors.time = 'End time must be after start time';
     }
@@ -81,9 +84,10 @@ export const EntryForm = ({ onSubmit, onCancel, editingEntry = null }) => {
           <button
             type="button"
             onClick={onCancel}
-            className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-1 hover:bg-gray-100 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500"
+            aria-label="Close form"
           >
-            <X size={18} className="text-gray-500" />
+            <X size={18} className="text-gray-500" aria-hidden="true" />
           </button>
         )}
       </div>
@@ -91,15 +95,18 @@ export const EntryForm = ({ onSubmit, onCancel, editingEntry = null }) => {
       <div className="p-4 space-y-4">
         {/* Date */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Date
+          <label htmlFor="entry-date" className="block text-sm font-medium text-gray-700 mb-1">
+            Date <span className="text-red-500" aria-hidden="true">*</span>
           </label>
           <input
+            id="entry-date"
             type="date"
             value={formData.date}
             onChange={(e) => handleChange('date', e.target.value)}
             min={twoWeeksAgo}
             max={today}
+            required
+            aria-required="true"
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
@@ -107,12 +114,15 @@ export const EntryForm = ({ onSubmit, onCancel, editingEntry = null }) => {
         {/* Time Range */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Start Time
+            <label htmlFor="entry-start-time" className="block text-sm font-medium text-gray-700 mb-1">
+              Start Time <span className="text-red-500" aria-hidden="true">*</span>
             </label>
             <select
+              id="entry-start-time"
               value={formData.startTime}
               onChange={(e) => handleChange('startTime', e.target.value)}
+              required
+              aria-required="true"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
               {timeOptions.map(time => (
@@ -123,12 +133,17 @@ export const EntryForm = ({ onSubmit, onCancel, editingEntry = null }) => {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              End Time
+            <label htmlFor="entry-end-time" className="block text-sm font-medium text-gray-700 mb-1">
+              End Time <span className="text-red-500" aria-hidden="true">*</span>
             </label>
             <select
+              id="entry-end-time"
               value={formData.endTime}
               onChange={(e) => handleChange('endTime', e.target.value)}
+              required
+              aria-required="true"
+              aria-invalid={!isValidDuration}
+              aria-describedby={!isValidDuration ? 'time-error' : undefined}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
               {timeOptions.map(time => (
@@ -141,8 +156,12 @@ export const EntryForm = ({ onSubmit, onCancel, editingEntry = null }) => {
         </div>
 
         {/* Duration Display */}
-        <div className={`flex items-center gap-2 text-sm ${isValidDuration ? 'text-gray-600' : 'text-red-600'}`}>
-          <Clock size={16} />
+        <div
+          id="time-error"
+          className={`flex items-center gap-2 text-sm ${isValidDuration ? 'text-gray-600' : 'text-red-600'}`}
+          role={isValidDuration ? 'status' : 'alert'}
+        >
+          <Clock size={16} aria-hidden="true" />
           {isValidDuration ? (
             <span>Duration: {duration} {duration === 1 ? 'hour' : 'hours'}</span>
           ) : (
@@ -152,31 +171,42 @@ export const EntryForm = ({ onSubmit, onCancel, editingEntry = null }) => {
 
         {/* Activity */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Activity Description
+          <label htmlFor="entry-activity" className="block text-sm font-medium text-gray-700 mb-1">
+            Activity Description <span className="text-red-500" aria-hidden="true">*</span>
           </label>
           <input
+            id="entry-activity"
             type="text"
             value={formData.activity}
             onChange={(e) => handleChange('activity', e.target.value)}
             placeholder="e.g., Client strategy call with Acme Corp"
+            required
+            aria-required="true"
+            aria-invalid={!!errors.activity}
+            aria-describedby={errors.activity ? 'activity-error' : undefined}
+            maxLength={500}
             className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
               errors.activity ? 'border-red-500' : 'border-gray-300'
             }`}
           />
           {errors.activity && (
-            <p className="mt-1 text-sm text-red-600">{errors.activity}</p>
+            <p id="activity-error" className="mt-1 text-sm text-red-600" role="alert">
+              {errors.activity}
+            </p>
           )}
         </div>
 
         {/* Category */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Category
+          <label htmlFor="entry-category" className="block text-sm font-medium text-gray-700 mb-1">
+            Category <span className="text-red-500" aria-hidden="true">*</span>
           </label>
           <select
+            id="entry-category"
             value={formData.categoryId}
             onChange={(e) => handleChange('categoryId', Number(e.target.value))}
+            required
+            aria-required="true"
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
             {categories.map(cat => (
@@ -189,14 +219,16 @@ export const EntryForm = ({ onSubmit, onCancel, editingEntry = null }) => {
 
         {/* Notes */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="entry-notes" className="block text-sm font-medium text-gray-700 mb-1">
             Notes <span className="text-gray-400 font-normal">(optional)</span>
           </label>
           <textarea
+            id="entry-notes"
             value={formData.notes}
             onChange={(e) => handleChange('notes', e.target.value)}
             placeholder="Any additional context..."
             rows={2}
+            maxLength={1000}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
           />
         </div>
@@ -207,7 +239,7 @@ export const EntryForm = ({ onSubmit, onCancel, editingEntry = null }) => {
           <button
             type="button"
             onClick={onCancel}
-            className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+            className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500"
           >
             Cancel
           </button>
@@ -215,9 +247,9 @@ export const EntryForm = ({ onSubmit, onCancel, editingEntry = null }) => {
         <button
           type="submit"
           disabled={!isValidDuration}
-          className="px-4 py-2 bg-[#0038ff] text-white rounded-lg hover:bg-[#0030dd] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+          className="px-4 py-2 bg-[#0038ff] text-white rounded-lg hover:bg-[#0030dd] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         >
-          <Plus size={18} />
+          <Plus size={18} aria-hidden="true" />
           {editingEntry ? 'Update Entry' : 'Add Entry'}
         </button>
       </div>

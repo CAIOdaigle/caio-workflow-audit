@@ -1,5 +1,21 @@
 import { categories } from '../data/categories';
 
+// Category ID constants to avoid magic numbers
+export const CATEGORY_IDS = {
+  CLIENT_ADVISORY: 1,
+  PILOT_MANAGEMENT: 2,
+  RESEARCH_EVALUATION: 3,
+  GOVERNANCE_DOCUMENTATION: 4,
+  COMMUNICATION: 5,
+  ADMINISTRATION: 6
+};
+
+// High-value category IDs (work clients pay for)
+export const HIGH_VALUE_CATEGORY_IDS = [CATEGORY_IDS.CLIENT_ADVISORY, CATEGORY_IDS.PILOT_MANAGEMENT];
+
+// Automatable category IDs (work AI can assist with)
+export const AUTOMATABLE_CATEGORY_IDS = [CATEGORY_IDS.COMMUNICATION, CATEGORY_IDS.ADMINISTRATION];
+
 export const calculateCategoryTotals = (entries) => {
   const totals = {};
 
@@ -48,8 +64,8 @@ export const getHighValuePercentage = (entries) => {
 
   if (totalHours === 0) return 0;
 
-  // Categories 1 (Advisory) and 2 (Pilot Management) are high-value
-  const highValueHours = totals[1] + totals[2];
+  // High-value categories: Advisory and Pilot Management
+  const highValueHours = HIGH_VALUE_CATEGORY_IDS.reduce((sum, id) => sum + (totals[id] || 0), 0);
   return Math.round((highValueHours / totalHours) * 100);
 };
 
@@ -59,8 +75,8 @@ export const getAutomatablePercentage = (entries) => {
 
   if (totalHours === 0) return 0;
 
-  // Categories 5 (Communication) and 6 (Administration) are most automatable
-  const automatableHours = totals[5] + totals[6];
+  // Automatable categories: Communication and Administration
+  const automatableHours = AUTOMATABLE_CATEGORY_IDS.reduce((sum, id) => sum + (totals[id] || 0), 0);
   return Math.round((automatableHours / totalHours) * 100);
 };
 
@@ -72,14 +88,31 @@ export const formatHours = (hours) => {
 };
 
 export const formatDuration = (startTime, endTime) => {
+  // Validate inputs
+  if (!startTime || !endTime || typeof startTime !== 'string' || typeof endTime !== 'string') {
+    return 0;
+  }
+
+  const timePattern = /^([01]?[0-9]|2[0-3]):([0-5][0-9])$/;
+  if (!timePattern.test(startTime) || !timePattern.test(endTime)) {
+    return 0;
+  }
+
   const [startHour, startMin] = startTime.split(':').map(Number);
   const [endHour, endMin] = endTime.split(':').map(Number);
+
+  // Guard against NaN
+  if (isNaN(startHour) || isNaN(startMin) || isNaN(endHour) || isNaN(endMin)) {
+    return 0;
+  }
 
   const startMinutes = startHour * 60 + startMin;
   const endMinutes = endHour * 60 + endMin;
 
   const durationMinutes = endMinutes - startMinutes;
-  return durationMinutes / 60;
+
+  // Return 0 for negative durations (end before start)
+  return durationMinutes > 0 ? durationMinutes / 60 : 0;
 };
 
 export const getChartData = (entries) => {
