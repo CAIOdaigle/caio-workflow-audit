@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 50" fill="none">
+  <defs>
+    <linearGradient id="headGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#E8A87C"/>
+      <stop offset="35%" style="stop-color:#C38D9E"/>
+      <stop offset="70%" style="stop-color:#7B68A6"/>
+      <stop offset="100%" style="stop-color:#41B3D3"/>
+    </linearGradient>
+  </defs>
+  <!-- Simplified head icon -->
+  <circle cx="25" cy="25" r="20" stroke="url(#headGrad)" stroke-width="2" fill="none"/>
+  <circle cx="18" cy="18" r="2" fill="url(#headGrad)"/>
+  <circle cx="32" cy="20" r="2.5" fill="url(#headGrad)"/>
+  <circle cx="22" cy="30" r="2" fill="url(#headGrad)"/>
+  <circle cx="15" cy="28" r="1.5" fill="url(#headGrad)"/>
+  <line x1="18" y1="18" x2="32" y2="20" stroke="url(#headGrad)" stroke-width="1"/>
+  <line x1="18" y1="18" x2="22" y2="30" stroke="url(#headGrad)" stroke-width="1"/>
+  <line x1="32" y1="20" x2="22" y2="30" stroke="url(#headGrad)" stroke-width="1"/>
+  <line x1="15" y1="28" x2="22" y2="30" stroke="url(#headGrad)" stroke-width="1"/>
+  <!-- Text -->
+  <text x="55" y="32" font-family="system-ui, sans-serif" font-size="16" font-weight="600" fill="#000221">Chief<tspan fill="#E8A87C">AI</tspan>Officer</text>
+</svg>
