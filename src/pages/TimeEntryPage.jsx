@@ -6,6 +6,7 @@ import { CategoryBreakdown, QuickStats } from '../components/Dashboard/CategoryB
 import { CategoryPieChart } from '../components/Dashboard/Charts';
 import { CategoryReference } from '../components/CategoryGuide/CategoryReference';
 import { getTotalHours, formatHours } from '../utils/calculations';
+import { TARGET_HOURS, MIN_ENTRIES_FOR_REVIEW, MIN_HOURS_FOR_INSIGHTS } from '../constants/app';
 
 export const TimeEntryPage = ({
   entries,
@@ -21,8 +22,7 @@ export const TimeEntryPage = ({
   const [showClearConfirm, setShowClearConfirm] = useState(false);
 
   const totalHours = getTotalHours(entries);
-  const targetHours = 80; // Two weeks of full-time work
-  const progress = Math.min((totalHours / targetHours) * 100, 100);
+  const progress = Math.min((totalHours / TARGET_HOURS) * 100, 100);
 
   const handleSubmit = (entry) => {
     if (editingEntry) {
@@ -59,7 +59,7 @@ export const TimeEntryPage = ({
               Progress: {formatHours(totalHours)} logged
             </span>
             <span className="text-sm text-gray-500">
-              Target: ~{targetHours} hrs (two weeks)
+              Target: ~{TARGET_HOURS} hrs (two weeks)
             </span>
           </div>
           <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
@@ -68,7 +68,7 @@ export const TimeEntryPage = ({
               style={{ width: `${progress}%` }}
             />
           </div>
-          {totalHours >= 20 && (
+          {totalHours >= MIN_HOURS_FOR_INSIGHTS && (
             <p className="text-xs text-green-600 mt-2">
               You have enough data for meaningful insights. Feel free to continue to the review step.
             </p>
@@ -134,7 +134,7 @@ export const TimeEntryPage = ({
             <CategoryPieChart entries={entries} />
             <CategoryBreakdown entries={entries} />
 
-            {entries.length >= 5 && (
+            {entries.length >= MIN_ENTRIES_FOR_REVIEW && (
               <button
                 onClick={onContinue}
                 className="w-full px-4 py-3 bg-[#0038ff] text-white font-medium rounded-lg hover:bg-[#0030dd] transition-colors"

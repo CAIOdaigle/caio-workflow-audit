@@ -72,17 +72,19 @@ export const EntryList = ({ entries, onEdit, onDelete }) => {
                         <div className="flex items-center gap-1">
                           <button
                             onClick={() => onEdit(entry)}
-                            className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
+                            className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
                             title="Edit entry"
+                            aria-label={`Edit ${entry.activity}`}
                           >
-                            <Edit2 size={16} className="text-gray-400" />
+                            <Edit2 size={16} className="text-gray-600" aria-hidden="true" />
                           </button>
                           <button
                             onClick={() => onDelete(entry.id)}
-                            className="p-1.5 hover:bg-red-50 rounded-lg transition-colors"
+                            className="p-1.5 hover:bg-red-50 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-red-500"
                             title="Delete entry"
+                            aria-label={`Delete ${entry.activity}`}
                           >
-                            <Trash2 size={16} className="text-gray-400 hover:text-red-500" />
+                            <Trash2 size={16} className="text-gray-600 hover:text-red-600" aria-hidden="true" />
                           </button>
                         </div>
                       </div>

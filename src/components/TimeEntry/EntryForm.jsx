@@ -87,7 +87,7 @@ export const EntryForm = ({ onSubmit, onCancel, editingEntry = null }) => {
             className="p-1 hover:bg-gray-100 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500"
             aria-label="Close form"
           >
-            <X size={18} className="text-gray-500" aria-hidden="true" />
+            <X size={18} className="text-gray-600" aria-hidden="true" />
           </button>
         )}
       </div>

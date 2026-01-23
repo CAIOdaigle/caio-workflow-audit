@@ -4,7 +4,8 @@ import { categories, getCategoryById, caioTrapBenchmark } from '../data/categori
 import { calculateCategoryTotals, calculateCategoryPercentages, getTotalHours, getHighValuePercentage, getAutomatablePercentage, formatHours } from './calculations';
 
 export const exportToPDF = (entries, reflections) => {
-  const doc = new jsPDF();
+  try {
+    const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
   const margin = 20;
   let y = 20;
@@ -139,4 +140,9 @@ export const exportToPDF = (entries, reflections) => {
 
   // Save
   doc.save(`caio-workflow-audit-${format(new Date(), 'yyyy-MM-dd')}.pdf`);
+    return { success: true };
+  } catch (error) {
+    console.error('PDF export failed:', error);
+    return { success: false, error: error.message || 'Failed to generate PDF' };
+  }
 };

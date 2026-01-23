@@ -57,7 +57,7 @@ export const CategoryReference = ({ isOpen, onClose }) => {
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
             aria-label="Close category guide"
           >
-            <X size={20} className="text-gray-500" aria-hidden="true" />
+            <X size={20} className="text-gray-600" aria-hidden="true" />
           </button>
         </div>
 
