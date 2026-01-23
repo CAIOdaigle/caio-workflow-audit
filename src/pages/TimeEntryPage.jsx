@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, HelpCircle, Trash2 } from 'lucide-react';
+import { Plus, HelpCircle, Trash2, ArrowRight } from 'lucide-react';
 import { EntryForm } from '../components/TimeEntry/EntryForm';
 import { EntryList } from '../components/TimeEntry/EntryList';
 import { CategoryBreakdown, QuickStats } from '../components/Dashboard/CategoryBreakdown';
@@ -7,6 +7,7 @@ import { CategoryPieChart } from '../components/Dashboard/Charts';
 import { CategoryReference } from '../components/CategoryGuide/CategoryReference';
 import { getTotalHours, formatHours } from '../utils/calculations';
 import { TARGET_HOURS, MIN_ENTRIES_FOR_REVIEW, MIN_HOURS_FOR_INSIGHTS } from '../constants/app';
+import { Button, Card } from '../components/ui';
 
 export const TimeEntryPage = ({
   entries,
@@ -53,61 +54,75 @@ export const TimeEntryPage = ({
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-6xl mx-auto px-4 py-6">
         {/* Progress Bar */}
-        <div className="bg-white rounded-xl border border-gray-200 p-4 mb-6">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-gray-700">
-              Progress: {formatHours(totalHours)} logged
-            </span>
+        <Card padding="sm" className="mb-6">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-3">
+              <span className="text-sm font-medium text-gray-700">
+                Progress
+              </span>
+              <span className="text-2xl font-bold text-primary">
+                {formatHours(totalHours)}
+              </span>
+              <span className="text-sm text-gray-500">logged</span>
+            </div>
             <span className="text-sm text-gray-500">
               Target: ~{TARGET_HOURS} hrs (two weeks)
             </span>
           </div>
-          <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+          <div className="relative h-3 bg-gray-100 rounded-full overflow-hidden">
             <div
-              className="h-full bg-[#0038ff] rounded-full transition-all duration-500"
+              className="absolute inset-y-0 left-0 bg-gradient-to-r from-primary to-primary-hover rounded-full transition-all duration-500"
               style={{ width: `${progress}%` }}
             />
+            {/* Progress percentage label */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="text-xs font-medium text-gray-600">
+                {Math.round(progress)}%
+              </span>
+            </div>
           </div>
           {totalHours >= MIN_HOURS_FOR_INSIGHTS && (
-            <p className="text-xs text-green-600 mt-2">
+            <p className="text-sm text-green-600 mt-3 font-medium">
               You have enough data for meaningful insights. Feel free to continue to the review step.
             </p>
           )}
-        </div>
+        </Card>
 
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Left Column - Entry Form & List */}
           <div className="lg:col-span-2 space-y-6">
             {/* Action Buttons */}
             <div className="flex items-center justify-between">
-              <button
+              <Button
                 onClick={() => {
                   setEditingEntry(null);
                   setShowForm(true);
                 }}
-                className="flex items-center gap-2 px-4 py-2 bg-[#0038ff] text-white rounded-lg hover:bg-[#0030dd] transition-colors"
+                className="gap-2"
               >
                 <Plus size={18} />
                 Add Time Block
-              </button>
+              </Button>
 
               <div className="flex items-center gap-2">
                 {entries.length > 0 && (
-                  <button
+                  <Button
+                    variant="danger"
                     onClick={() => setShowClearConfirm(true)}
-                    className="flex items-center gap-2 px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    className="gap-2"
                   >
                     <Trash2 size={16} />
                     Clear All
-                  </button>
+                  </Button>
                 )}
-                <button
+                <Button
+                  variant="ghost"
                   onClick={() => setShowGuide(true)}
-                  className="flex items-center gap-2 px-3 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="gap-2"
                 >
                   <HelpCircle size={18} />
                   Category Guide
-                </button>
+                </Button>
               </div>
             </div>
 
@@ -135,12 +150,14 @@ export const TimeEntryPage = ({
             <CategoryBreakdown entries={entries} />
 
             {entries.length >= MIN_ENTRIES_FOR_REVIEW && (
-              <button
+              <Button
                 onClick={onContinue}
-                className="w-full px-4 py-3 bg-[#0038ff] text-white font-medium rounded-lg hover:bg-[#0030dd] transition-colors"
+                size="lg"
+                className="w-full gap-2"
               >
                 Continue to Review
-              </button>
+                <ArrowRight size={18} />
+              </Button>
             )}
           </div>
         </div>
@@ -163,7 +180,7 @@ export const TimeEntryPage = ({
             }
           }}
         >
-          <div className="bg-white rounded-xl max-w-md w-full p-6" role="document">
+          <Card className="max-w-md w-full" role="document">
             <h3 id="clear-dialog-title" className="text-lg font-semibold text-gray-900 mb-2">
               Clear All Entries?
             </h3>
@@ -171,20 +188,21 @@ export const TimeEntryPage = ({
               This will delete all {entries.length} time entries. This action cannot be undone.
             </p>
             <div className="flex justify-end gap-3">
-              <button
+              <Button
+                variant="ghost"
                 onClick={() => setShowClearConfirm(false)}
-                className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500"
               >
                 Cancel
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="danger"
                 onClick={handleClearAll}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500"
+                className="bg-red-600 hover:bg-red-700 text-white"
               >
                 Clear All
-              </button>
+              </Button>
             </div>
-          </div>
+          </Card>
         </div>
       )}
     </div>

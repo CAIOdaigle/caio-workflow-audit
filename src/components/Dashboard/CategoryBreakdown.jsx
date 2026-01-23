@@ -1,19 +1,20 @@
 import { categories } from '../../data/categories';
 import { calculateCategoryTotals, calculateCategoryPercentages, formatHours } from '../../utils/calculations';
+import { Card } from '../ui';
 
 export const CategoryBreakdown = ({ entries }) => {
   const totals = calculateCategoryTotals(entries);
   const percentages = calculateCategoryPercentages(entries);
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-      <div className="px-4 py-3 border-b border-gray-200">
+    <Card padding="none" className="overflow-hidden">
+      <div className="px-5 py-4 border-b border-gray-100">
         <h3 className="font-semibold text-gray-900">Category Breakdown</h3>
       </div>
 
       <div className="divide-y divide-gray-100">
         {categories.map(cat => (
-          <div key={cat.id} className="px-4 py-3">
+          <div key={cat.id} className="px-5 py-4">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
                 <div
@@ -38,7 +39,7 @@ export const CategoryBreakdown = ({ entries }) => {
           </div>
         ))}
       </div>
-    </div>
+    </Card>
   );
 };
 
@@ -56,21 +57,21 @@ export const QuickStats = ({ entries }) => {
 
   return (
     <div className="grid grid-cols-2 gap-4">
-      <div className="bg-white rounded-xl border border-gray-200 p-4">
+      <Card padding="sm">
         <div className="text-sm text-gray-500 mb-1">High-Value Work</div>
-        <div className="text-2xl font-bold text-blue-600">{highValuePercent}%</div>
+        <div className="text-2xl font-bold text-primary">{highValuePercent}%</div>
         <div className="text-xs text-gray-400 mt-1">
           Advisory + Pilot Management
         </div>
-      </div>
+      </Card>
 
-      <div className="bg-white rounded-xl border border-gray-200 p-4">
+      <Card padding="sm">
         <div className="text-sm text-gray-500 mb-1">Automatable Work</div>
         <div className="text-2xl font-bold text-amber-600">{automatablePercent}%</div>
         <div className="text-xs text-gray-400 mt-1">
           Communication + Administration
         </div>
-      </div>
+      </Card>
     </div>
   );
 };

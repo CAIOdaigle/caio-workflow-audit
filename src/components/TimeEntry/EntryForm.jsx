@@ -5,6 +5,7 @@ import { X, Plus, Clock } from 'lucide-react';
 import { categories } from '../../data/categories';
 import { formatDuration } from '../../utils/calculations';
 import { ENTRY_CONSTRAINTS, TIME_PICKER } from '../../constants/app';
+import { Button, Card } from '../ui';
 
 const timeOptions = [];
 for (let hour = TIME_PICKER.START_HOUR; hour <= TIME_PICKER.END_HOUR; hour++) {
@@ -75,9 +76,12 @@ export const EntryForm = ({ onSubmit, onCancel, editingEntry = null }) => {
     }
   };
 
+  const inputStyles = "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors";
+  const errorInputStyles = "w-full px-3 py-2 border border-red-500 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500";
+
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-gray-200 shadow-sm">
-      <div className="px-4 py-3 border-b border-gray-200 flex items-center justify-between">
+    <Card as="form" onSubmit={handleSubmit} padding="none">
+      <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
         <h3 className="font-semibold text-gray-900">
           {editingEntry ? 'Edit Time Block' : 'Add Time Block'}
         </h3>
@@ -85,18 +89,18 @@ export const EntryForm = ({ onSubmit, onCancel, editingEntry = null }) => {
           <button
             type="button"
             onClick={onCancel}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500"
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
             aria-label="Close form"
           >
-            <X size={18} className="text-gray-600" aria-hidden="true" />
+            <X size={18} className="text-gray-500" aria-hidden="true" />
           </button>
         )}
       </div>
 
-      <div className="p-4 space-y-4">
+      <div className="p-6 space-y-5">
         {/* Date */}
         <div>
-          <label htmlFor="entry-date" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="entry-date" className="block text-sm font-medium text-gray-700 mb-1.5">
             Date <span className="text-red-500" aria-hidden="true">*</span>
           </label>
           <input
@@ -108,14 +112,14 @@ export const EntryForm = ({ onSubmit, onCancel, editingEntry = null }) => {
             max={today}
             required
             aria-required="true"
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className={inputStyles}
           />
         </div>
 
         {/* Time Range */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-4">
           <div>
-            <label htmlFor="entry-start-time" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="entry-start-time" className="block text-sm font-medium text-gray-700 mb-1.5">
               Start Time <span className="text-red-500" aria-hidden="true">*</span>
             </label>
             <select
@@ -124,7 +128,7 @@ export const EntryForm = ({ onSubmit, onCancel, editingEntry = null }) => {
               onChange={(e) => handleChange('startTime', e.target.value)}
               required
               aria-required="true"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className={inputStyles}
             >
               {timeOptions.map(time => (
                 <option key={time} value={time}>
@@ -134,7 +138,7 @@ export const EntryForm = ({ onSubmit, onCancel, editingEntry = null }) => {
             </select>
           </div>
           <div>
-            <label htmlFor="entry-end-time" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="entry-end-time" className="block text-sm font-medium text-gray-700 mb-1.5">
               End Time <span className="text-red-500" aria-hidden="true">*</span>
             </label>
             <select
@@ -145,7 +149,7 @@ export const EntryForm = ({ onSubmit, onCancel, editingEntry = null }) => {
               aria-required="true"
               aria-invalid={!isValidDuration}
               aria-describedby={!isValidDuration ? 'time-error' : undefined}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className={inputStyles}
             >
               {timeOptions.map(time => (
                 <option key={time} value={time}>
@@ -159,12 +163,16 @@ export const EntryForm = ({ onSubmit, onCancel, editingEntry = null }) => {
         {/* Duration Display */}
         <div
           id="time-error"
-          className={`flex items-center gap-2 text-sm ${isValidDuration ? 'text-gray-600' : 'text-red-600'}`}
+          className={`flex items-center gap-2 text-sm py-2 px-3 rounded-lg ${
+            isValidDuration
+              ? 'bg-gray-50 text-gray-600'
+              : 'bg-red-50 text-red-600'
+          }`}
           role={isValidDuration ? 'status' : 'alert'}
         >
           <Clock size={16} aria-hidden="true" />
           {isValidDuration ? (
-            <span>Duration: {duration} {duration === 1 ? 'hour' : 'hours'}</span>
+            <span>Duration: <strong>{duration} {duration === 1 ? 'hour' : 'hours'}</strong></span>
           ) : (
             <span>End time must be after start time</span>
           )}
@@ -172,7 +180,7 @@ export const EntryForm = ({ onSubmit, onCancel, editingEntry = null }) => {
 
         {/* Activity */}
         <div>
-          <label htmlFor="entry-activity" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="entry-activity" className="block text-sm font-medium text-gray-700 mb-1.5">
             Activity Description <span className="text-red-500" aria-hidden="true">*</span>
           </label>
           <input
@@ -186,11 +194,9 @@ export const EntryForm = ({ onSubmit, onCancel, editingEntry = null }) => {
             aria-invalid={!!errors.activity}
             aria-describedby={errors.activity ? 'activity-error' : 'activity-count'}
             maxLength={ENTRY_CONSTRAINTS.MAX_ACTIVITY_LENGTH}
-            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-              errors.activity ? 'border-red-500' : 'border-gray-300'
-            }`}
+            className={errors.activity ? errorInputStyles : inputStyles}
           />
-          <div className="flex justify-between mt-1">
+          <div className="flex justify-between mt-1.5">
             {errors.activity ? (
               <p id="activity-error" className="text-sm text-red-600" role="alert">
                 {errors.activity}
@@ -214,7 +220,7 @@ export const EntryForm = ({ onSubmit, onCancel, editingEntry = null }) => {
 
         {/* Category */}
         <div>
-          <label htmlFor="entry-category" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="entry-category" className="block text-sm font-medium text-gray-700 mb-1.5">
             Category <span className="text-red-500" aria-hidden="true">*</span>
           </label>
           <select
@@ -223,7 +229,7 @@ export const EntryForm = ({ onSubmit, onCancel, editingEntry = null }) => {
             onChange={(e) => handleChange('categoryId', Number(e.target.value))}
             required
             aria-required="true"
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className={inputStyles}
           >
             {categories.map(cat => (
               <option key={cat.id} value={cat.id}>
@@ -235,7 +241,7 @@ export const EntryForm = ({ onSubmit, onCancel, editingEntry = null }) => {
 
         {/* Notes */}
         <div>
-          <label htmlFor="entry-notes" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="entry-notes" className="block text-sm font-medium text-gray-700 mb-1.5">
             Notes <span className="text-gray-400 font-normal">(optional)</span>
           </label>
           <textarea
@@ -246,9 +252,9 @@ export const EntryForm = ({ onSubmit, onCancel, editingEntry = null }) => {
             rows={2}
             maxLength={ENTRY_CONSTRAINTS.MAX_NOTES_LENGTH}
             aria-describedby="notes-count"
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+            className={`${inputStyles} resize-none`}
           />
-          <div className="flex justify-end mt-1">
+          <div className="flex justify-end mt-1.5">
             <span
               id="notes-count"
               className={`text-xs ${
@@ -264,25 +270,25 @@ export const EntryForm = ({ onSubmit, onCancel, editingEntry = null }) => {
         </div>
       </div>
 
-      <div className="px-4 py-3 border-t border-gray-200 flex justify-end gap-3">
+      <div className="px-6 py-4 border-t border-gray-100 flex justify-end gap-3 bg-gray-50/50 rounded-b-card">
         {onCancel && (
-          <button
+          <Button
             type="button"
+            variant="ghost"
             onClick={onCancel}
-            className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500"
           >
             Cancel
-          </button>
+          </Button>
         )}
-        <button
+        <Button
           type="submit"
           disabled={!isValidDuration}
-          className="px-4 py-2 bg-[#0038ff] text-white rounded-lg hover:bg-[#0030dd] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          className="gap-2"
         >
           <Plus size={18} aria-hidden="true" />
           {editingEntry ? 'Update Entry' : 'Add Entry'}
-        </button>
+        </Button>
       </div>
-    </form>
+    </Card>
   );
 };

@@ -4,6 +4,7 @@ import { getCategoryById } from '../../data/categories';
 import { CategoryBadge } from '../CategoryGuide/CategoryReference';
 import { getEntriesByDate, formatHours } from '../../utils/calculations';
 import { ENTRY_CONSTRAINTS } from '../../constants/app';
+import { Card } from '../ui';
 
 const formatTimeDisplay = (time) => {
   const [hour, min] = time.split(':').map(Number);
@@ -18,10 +19,10 @@ export const EntryList = ({ entries, onEdit, onDelete }) => {
 
   if (entries.length === 0) {
     return (
-      <div className="bg-white rounded-xl border border-gray-200 p-8">
+      <Card>
         <div className="text-center mb-6">
-          <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Clock size={32} className="text-[#0038ff]" />
+          <div className="w-16 h-16 bg-primary-light rounded-full flex items-center justify-center mx-auto mb-4">
+            <Clock size={32} className="text-primary" />
           </div>
           <h3 className="text-lg font-semibold text-gray-900 mb-2">Ready to audit your workflow</h3>
           <p className="text-gray-600 max-w-md mx-auto">
@@ -29,12 +30,12 @@ export const EntryList = ({ entries, onEdit, onDelete }) => {
           </p>
         </div>
 
-        <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+        <div className="bg-gray-50 rounded-xl p-5 space-y-3">
           <h4 className="font-medium text-gray-900 flex items-center gap-2">
             <Lightbulb size={16} className="text-amber-500" aria-hidden="true" />
             Tips for getting started
           </h4>
-          <ul className="text-sm text-gray-600 space-y-2">
+          <ul className="text-sm text-gray-600 space-y-2.5">
             <li className="flex items-start gap-2">
               <Calendar size={14} className="text-gray-400 mt-0.5 flex-shrink-0" aria-hidden="true" />
               <span>Open your calendar to reconstruct where your time went</span>
@@ -49,7 +50,7 @@ export const EntryList = ({ entries, onEdit, onDelete }) => {
             </li>
           </ul>
         </div>
-      </div>
+      </Card>
     );
   }
 
@@ -60,26 +61,26 @@ export const EntryList = ({ entries, onEdit, onDelete }) => {
         const dayTotal = dayEntries.reduce((sum, e) => sum + e.duration, 0);
 
         return (
-          <div key={date} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-            <div className="px-4 py-3 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
+          <Card key={date} padding="none" className="overflow-hidden">
+            <div className="px-5 py-4 bg-gray-50/80 border-b border-gray-100 flex items-center justify-between">
               <h3 className="font-semibold text-gray-900">
                 {format(parseISO(date), 'EEEE, MMMM d, yyyy')}
               </h3>
-              <span className="text-sm text-gray-500">{formatHours(dayTotal)}</span>
+              <span className="text-sm font-medium text-gray-500">{formatHours(dayTotal)}</span>
             </div>
 
             <ul className="divide-y divide-gray-100" role="list" aria-label="Time entries">
-              {dayEntries.map((entry, index) => {
+              {dayEntries.map((entry) => {
                 const category = getCategoryById(entry.categoryId);
                 return (
                   <li
                     key={entry.id}
-                    className="px-4 py-3 hover:bg-gray-50 transition-colors focus-within:bg-blue-50"
+                    className="px-5 py-4 hover:bg-gray-50/50 transition-colors focus-within:bg-primary-light/30"
                     role="listitem"
                   >
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-3 mb-1">
+                        <div className="flex items-center gap-3 mb-1.5">
                           <span className="text-sm text-gray-500">
                             {formatTimeDisplay(entry.startTime)} - {formatTimeDisplay(entry.endTime)}
                           </span>
@@ -98,7 +99,7 @@ export const EntryList = ({ entries, onEdit, onDelete }) => {
                         <div className="flex items-center gap-1" role="group" aria-label="Entry actions">
                           <button
                             onClick={() => onEdit(entry)}
-                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                             title="Edit entry (E)"
                             aria-label={`Edit ${entry.activity}`}
                             onKeyDown={(e) => {
@@ -108,11 +109,11 @@ export const EntryList = ({ entries, onEdit, onDelete }) => {
                               }
                             }}
                           >
-                            <Edit2 size={16} className="text-gray-600" aria-hidden="true" />
+                            <Edit2 size={16} className="text-gray-500" aria-hidden="true" />
                           </button>
                           <button
                             onClick={() => onDelete(entry.id)}
-                            className="p-2 hover:bg-red-50 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-red-500"
+                            className="p-2 hover:bg-red-50 rounded-lg transition-colors"
                             title="Delete entry (D)"
                             aria-label={`Delete ${entry.activity}`}
                             onKeyDown={(e) => {
@@ -122,7 +123,7 @@ export const EntryList = ({ entries, onEdit, onDelete }) => {
                               }
                             }}
                           >
-                            <Trash2 size={16} className="text-gray-600 hover:text-red-600" aria-hidden="true" />
+                            <Trash2 size={16} className="text-gray-500 hover:text-red-600" aria-hidden="true" />
                           </button>
                         </div>
                       </div>
@@ -131,7 +132,7 @@ export const EntryList = ({ entries, onEdit, onDelete }) => {
                 );
               })}
             </ul>
-          </div>
+          </Card>
         );
       })}
     </div>

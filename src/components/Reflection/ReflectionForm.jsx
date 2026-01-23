@@ -1,6 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { categories } from '../../data/categories';
 import { getHighValuePercentage, getAutomatablePercentage } from '../../utils/calculations';
+import { Button, Card } from '../ui';
+import { ArrowRight } from 'lucide-react';
 
 export const ReflectionForm = ({ entries, reflections, onUpdate, onContinue }) => {
   const highValuePercent = getHighValuePercentage(entries);
@@ -20,29 +22,31 @@ export const ReflectionForm = ({ entries, reflections, onUpdate, onContinue }) =
 
   const canContinue = formData.mostSurprisingCategory && formData.surpriseExplanation.trim() && formData.biggestOpportunity.trim();
 
+  const inputStyles = "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors";
+
   return (
     <div className="max-w-2xl mx-auto space-y-6">
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
+      <Card>
         <h2 className="text-xl font-bold text-gray-900 mb-6">Reflection Questions</h2>
 
         <div className="space-y-8">
           {/* Question 1 - Auto calculated */}
-          <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
-            <p className="text-sm font-medium text-blue-900 mb-2">
+          <div className="p-5 bg-primary-light rounded-xl">
+            <p className="text-sm font-medium text-primary-dark mb-2">
               1. What percentage of your time went to Categories 1 and 2 (highest-value work)?
             </p>
-            <p className="text-3xl font-bold text-blue-600">{highValuePercent}%</p>
-            <p className="text-sm text-blue-700 mt-2">
+            <p className="text-4xl font-bold text-primary">{highValuePercent}%</p>
+            <p className="text-sm text-gray-700 mt-2">
               This is your time spent on Client Advisory and Pilot Management — the work clients actually hire you for.
             </p>
           </div>
 
           {/* Question 2 - Auto calculated */}
-          <div className="p-4 bg-amber-50 rounded-lg border border-amber-100">
+          <div className="p-5 bg-amber-50 rounded-xl">
             <p className="text-sm font-medium text-amber-900 mb-2">
               2. What percentage went to Categories 5 and 6 (most automatable)?
             </p>
-            <p className="text-3xl font-bold text-amber-600">{automatablePercent}%</p>
+            <p className="text-4xl font-bold text-amber-600">{automatablePercent}%</p>
             <p className="text-sm text-amber-700 mt-2">
               This is your time spent on Communication and Administration — work that AI can help automate.
             </p>
@@ -56,7 +60,7 @@ export const ReflectionForm = ({ entries, reflections, onUpdate, onContinue }) =
             <select
               value={formData.mostSurprisingCategory}
               onChange={(e) => handleChange('mostSurprisingCategory', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 mb-3"
+              className={`${inputStyles} mb-4`}
             >
               <option value="">Select a category...</option>
               {categories.map(cat => (
@@ -74,7 +78,7 @@ export const ReflectionForm = ({ entries, reflections, onUpdate, onContinue }) =
               onChange={(e) => handleChange('surpriseExplanation', e.target.value)}
               placeholder="Explain what you expected vs. what you found..."
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+              className={`${inputStyles} resize-none`}
             />
           </div>
 
@@ -91,20 +95,22 @@ export const ReflectionForm = ({ entries, reflections, onUpdate, onContinue }) =
               onChange={(e) => handleChange('biggestOpportunity', e.target.value)}
               placeholder="e.g., Email responses could be templated, status updates could be automated..."
               rows={4}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+              className={`${inputStyles} resize-none`}
             />
           </div>
         </div>
-      </div>
+      </Card>
 
       <div className="flex justify-end">
-        <button
+        <Button
           onClick={onContinue}
           disabled={!canContinue}
-          className="px-6 py-3 bg-[#0038ff] text-white font-medium rounded-lg hover:bg-[#0030dd] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          size="lg"
+          className="gap-2"
         >
           View Summary
-        </button>
+          <ArrowRight size={18} />
+        </Button>
       </div>
 
       {!canContinue && (

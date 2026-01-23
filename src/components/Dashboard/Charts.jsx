@@ -1,6 +1,25 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 import { categories, caioTrapBenchmark } from '../../data/categories';
 import { calculateCategoryPercentages, calculateCategoryTotals, formatHours } from '../../utils/calculations';
+import { Card } from '../ui';
+
+// Custom tooltip styling
+const CustomTooltip = ({ active, payload, label, formatter }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-white px-3 py-2 rounded-lg shadow-card-hover border border-gray-100">
+        {label && <p className="text-sm font-medium text-gray-900 mb-1">{label}</p>}
+        {payload.map((entry, index) => (
+          <p key={index} className="text-sm text-gray-600">
+            <span style={{ color: entry.color }}>{entry.name}: </span>
+            {formatter ? formatter(entry.value, entry.name, entry) : entry.value}
+          </p>
+        ))}
+      </div>
+    );
+  }
+  return null;
+};
 
 export const CategoryPieChart = ({ entries }) => {
   const percentages = calculateCategoryPercentages(entries);
@@ -15,14 +34,14 @@ export const CategoryPieChart = ({ entries }) => {
 
   if (data.length === 0) {
     return (
-      <div className="bg-white rounded-xl border border-gray-200 p-6 flex items-center justify-center h-64">
+      <Card className="flex items-center justify-center h-64">
         <p className="text-gray-400">Add entries to see your distribution</p>
-      </div>
+      </Card>
     );
   }
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4">
+    <Card>
       <h3 className="font-semibold text-gray-900 mb-4">Time Distribution</h3>
       <ResponsiveContainer width="100%" height={250}>
         <PieChart>
@@ -34,7 +53,7 @@ export const CategoryPieChart = ({ entries }) => {
             outerRadius={90}
             paddingAngle={2}
             dataKey="value"
-            label={({ name, value }) => `${value}%`}
+            label={({ value }) => `${value}%`}
             labelLine={false}
           >
             {data.map((entry, index) => (
@@ -42,10 +61,11 @@ export const CategoryPieChart = ({ entries }) => {
             ))}
           </Pie>
           <Tooltip
-            formatter={(value, name, props) => [
-              `${value}% (${formatHours(props.payload.hours)})`,
-              name
-            ]}
+            content={
+              <CustomTooltip
+                formatter={(value, name, entry) => `${value}% (${formatHours(entry.payload.hours)})`}
+              />
+            }
           />
         </PieChart>
       </ResponsiveContainer>
@@ -62,7 +82,7 @@ export const CategoryPieChart = ({ entries }) => {
           </div>
         ))}
       </div>
-    </div>
+    </Card>
   );
 };
 
@@ -72,9 +92,9 @@ export const BenchmarkComparison = ({ entries }) => {
 
   if (totalHours === 0) {
     return (
-      <div className="bg-white rounded-xl border border-gray-200 p-6 flex items-center justify-center h-64">
+      <Card className="flex items-center justify-center h-64">
         <p className="text-gray-400">Add entries to see benchmark comparison</p>
-      </div>
+      </Card>
     );
   }
 
@@ -87,7 +107,7 @@ export const BenchmarkComparison = ({ entries }) => {
   }));
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4">
+    <Card>
       <div className="mb-4">
         <h3 className="font-semibold text-gray-900">vs. "The CAIO Trap"</h3>
         <p className="text-sm text-gray-500">
@@ -100,15 +120,19 @@ export const BenchmarkComparison = ({ entries }) => {
           <XAxis type="number" domain={[0, 60]} unit="%" />
           <YAxis type="category" dataKey="name" width={40} />
           <Tooltip
-            formatter={(value, name) => [`${value}%`, name === 'yours' ? 'Your Time' : 'CAIO Trap']}
-            labelFormatter={(label) => data.find(d => d.name === label)?.fullName}
+            content={
+              <CustomTooltip
+                label={data.find(d => d.name === data[0]?.name)?.fullName}
+                formatter={(value, name) => `${value}%`}
+              />
+            }
           />
           <Legend />
-          <Bar dataKey="yours" name="Your Time" fill="#2563eb" radius={[0, 4, 4, 0]} />
+          <Bar dataKey="yours" name="Your Time" fill="#0038ff" radius={[0, 4, 4, 0]} />
           <Bar dataKey="trap" name="CAIO Trap" fill="#94a3b8" radius={[0, 4, 4, 0]} />
         </BarChart>
       </ResponsiveContainer>
-    </div>
+    </Card>
   );
 };
 
@@ -127,12 +151,12 @@ export const HighValueVsAutomatable = ({ entries }) => {
   const otherPercent = 100 - highValuePercent - automatablePercent;
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4">
+    <Card>
       <h3 className="font-semibold text-gray-900 mb-4">Value Analysis</h3>
 
       <div className="h-8 flex rounded-full overflow-hidden mb-4">
         <div
-          className="bg-blue-600 flex items-center justify-center"
+          className="bg-primary flex items-center justify-center"
           style={{ width: `${highValuePercent}%` }}
         >
           {highValuePercent > 10 && (
@@ -160,10 +184,10 @@ export const HighValueVsAutomatable = ({ entries }) => {
       <div className="grid grid-cols-3 gap-2 text-center">
         <div>
           <div className="flex items-center justify-center gap-1 mb-1">
-            <div className="w-2 h-2 rounded-full bg-blue-600" />
+            <div className="w-2 h-2 rounded-full bg-primary" />
             <span className="text-xs text-gray-600">High-Value</span>
           </div>
-          <p className="font-semibold text-blue-600">{formatHours(highValue)}</p>
+          <p className="font-semibold text-primary">{formatHours(highValue)}</p>
         </div>
         <div>
           <div className="flex items-center justify-center gap-1 mb-1">
@@ -180,6 +204,6 @@ export const HighValueVsAutomatable = ({ entries }) => {
           <p className="font-semibold text-amber-600">{formatHours(automatable)}</p>
         </div>
       </div>
-    </div>
+    </Card>
   );
 };
