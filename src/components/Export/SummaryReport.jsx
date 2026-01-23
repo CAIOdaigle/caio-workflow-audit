@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Download, FileText, Table, CheckCircle, AlertTriangle, TrendingUp } from 'lucide-react';
+import { Download, FileText, Table, CheckCircle, AlertTriangle, TrendingUp, Loader2 } from 'lucide-react';
 import { categories, getCategoryById, caioTrapBenchmark } from '../../data/categories';
 import {
   calculateCategoryTotals,
@@ -16,17 +16,29 @@ import { WORKFLOW_THRESHOLDS } from '../../constants/app';
 
 export const SummaryReport = ({ entries, reflections, onComplete }) => {
   const [exportStatus, setExportStatus] = useState(null);
+  const [isExporting, setIsExporting] = useState({ pdf: false, csv: false });
 
-  const handleExportPDF = () => {
+  const handleExportPDF = async () => {
+    setIsExporting(prev => ({ ...prev, pdf: true }));
+    // Small delay to allow UI to update before potentially blocking operation
+    await new Promise(resolve => setTimeout(resolve, 50));
+
     const result = exportToPDF(entries, reflections);
+    setIsExporting(prev => ({ ...prev, pdf: false }));
+
     if (result?.success === false) {
       setExportStatus({ type: 'error', message: result.error });
       setTimeout(() => setExportStatus(null), 4000);
     }
   };
 
-  const handleExportCSV = () => {
+  const handleExportCSV = async () => {
+    setIsExporting(prev => ({ ...prev, csv: true }));
+    await new Promise(resolve => setTimeout(resolve, 50));
+
     const result = exportToCSV(entries);
+    setIsExporting(prev => ({ ...prev, csv: false }));
+
     if (result?.success === false) {
       setExportStatus({ type: 'error', message: result.error });
       setTimeout(() => setExportStatus(null), 4000);
@@ -59,17 +71,27 @@ export const SummaryReport = ({ entries, reflections, onComplete }) => {
           <div className="flex gap-2">
             <button
               onClick={handleExportPDF}
-              className="flex items-center gap-2 px-4 py-2 bg-[#0038ff] text-white rounded-lg hover:bg-[#0030dd] transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              disabled={isExporting.pdf}
+              className="flex items-center gap-2 px-4 py-2 bg-[#0038ff] text-white rounded-lg hover:bg-[#0030dd] transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-wait"
             >
-              <FileText size={18} aria-hidden="true" />
-              Export PDF
+              {isExporting.pdf ? (
+                <Loader2 size={18} className="animate-spin" aria-hidden="true" />
+              ) : (
+                <FileText size={18} aria-hidden="true" />
+              )}
+              {isExporting.pdf ? 'Generating...' : 'Export PDF'}
             </button>
             <button
               onClick={handleExportCSV}
-              className="flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+              disabled={isExporting.csv}
+              className="flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-wait"
             >
-              <Table size={18} aria-hidden="true" />
-              Export CSV
+              {isExporting.csv ? (
+                <Loader2 size={18} className="animate-spin" aria-hidden="true" />
+              ) : (
+                <Table size={18} aria-hidden="true" />
+              )}
+              {isExporting.csv ? 'Generating...' : 'Export CSV'}
             </button>
           </div>
           {exportStatus?.type === 'error' && (

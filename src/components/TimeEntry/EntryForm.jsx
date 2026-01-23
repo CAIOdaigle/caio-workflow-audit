@@ -4,10 +4,11 @@ import { format, subDays } from 'date-fns';
 import { X, Plus, Clock } from 'lucide-react';
 import { categories } from '../../data/categories';
 import { formatDuration } from '../../utils/calculations';
+import { ENTRY_CONSTRAINTS, TIME_PICKER } from '../../constants/app';
 
 const timeOptions = [];
-for (let hour = 6; hour <= 22; hour++) {
-  for (let min = 0; min < 60; min += 15) {
+for (let hour = TIME_PICKER.START_HOUR; hour <= TIME_PICKER.END_HOUR; hour++) {
+  for (let min = 0; min < 60; min += TIME_PICKER.INCREMENT_MINUTES) {
     const time = `${hour.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}`;
     timeOptions.push(time);
   }
@@ -22,7 +23,7 @@ const formatTimeDisplay = (time) => {
 
 export const EntryForm = ({ onSubmit, onCancel, editingEntry = null }) => {
   const today = format(new Date(), 'yyyy-MM-dd');
-  const twoWeeksAgo = format(subDays(new Date(), 14), 'yyyy-MM-dd');
+  const minDate = format(subDays(new Date(), ENTRY_CONSTRAINTS.MAX_DAYS_BACK), 'yyyy-MM-dd');
 
   const [formData, setFormData] = useState({
     date: editingEntry?.date || today,
@@ -45,8 +46,8 @@ export const EntryForm = ({ onSubmit, onCancel, editingEntry = null }) => {
     if (!formData.activity.trim()) {
       newErrors.activity = 'Activity description is required';
     }
-    if (formData.activity.length > 500) {
-      newErrors.activity = 'Activity description must be less than 500 characters';
+    if (formData.activity.length > ENTRY_CONSTRAINTS.MAX_ACTIVITY_LENGTH) {
+      newErrors.activity = `Activity description must be less than ${ENTRY_CONSTRAINTS.MAX_ACTIVITY_LENGTH} characters`;
     }
     if (!isValidDuration) {
       newErrors.time = 'End time must be after start time';
@@ -84,7 +85,7 @@ export const EntryForm = ({ onSubmit, onCancel, editingEntry = null }) => {
           <button
             type="button"
             onClick={onCancel}
-            className="p-1 hover:bg-gray-100 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500"
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500"
             aria-label="Close form"
           >
             <X size={18} className="text-gray-600" aria-hidden="true" />
@@ -103,7 +104,7 @@ export const EntryForm = ({ onSubmit, onCancel, editingEntry = null }) => {
             type="date"
             value={formData.date}
             onChange={(e) => handleChange('date', e.target.value)}
-            min={twoWeeksAgo}
+            min={minDate}
             max={today}
             required
             aria-required="true"
@@ -183,17 +184,32 @@ export const EntryForm = ({ onSubmit, onCancel, editingEntry = null }) => {
             required
             aria-required="true"
             aria-invalid={!!errors.activity}
-            aria-describedby={errors.activity ? 'activity-error' : undefined}
-            maxLength={500}
+            aria-describedby={errors.activity ? 'activity-error' : 'activity-count'}
+            maxLength={ENTRY_CONSTRAINTS.MAX_ACTIVITY_LENGTH}
             className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
               errors.activity ? 'border-red-500' : 'border-gray-300'
             }`}
           />
-          {errors.activity && (
-            <p id="activity-error" className="mt-1 text-sm text-red-600" role="alert">
-              {errors.activity}
-            </p>
-          )}
+          <div className="flex justify-between mt-1">
+            {errors.activity ? (
+              <p id="activity-error" className="text-sm text-red-600" role="alert">
+                {errors.activity}
+              </p>
+            ) : (
+              <span />
+            )}
+            <span
+              id="activity-count"
+              className={`text-xs ${
+                formData.activity.length > ENTRY_CONSTRAINTS.MAX_ACTIVITY_LENGTH * 0.9
+                  ? 'text-amber-600'
+                  : 'text-gray-400'
+              }`}
+              aria-live="polite"
+            >
+              {formData.activity.length}/{ENTRY_CONSTRAINTS.MAX_ACTIVITY_LENGTH}
+            </span>
+          </div>
         </div>
 
         {/* Category */}
@@ -228,9 +244,23 @@ export const EntryForm = ({ onSubmit, onCancel, editingEntry = null }) => {
             onChange={(e) => handleChange('notes', e.target.value)}
             placeholder="Any additional context..."
             rows={2}
-            maxLength={1000}
+            maxLength={ENTRY_CONSTRAINTS.MAX_NOTES_LENGTH}
+            aria-describedby="notes-count"
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
           />
+          <div className="flex justify-end mt-1">
+            <span
+              id="notes-count"
+              className={`text-xs ${
+                formData.notes.length > ENTRY_CONSTRAINTS.MAX_NOTES_LENGTH * 0.9
+                  ? 'text-amber-600'
+                  : 'text-gray-400'
+              }`}
+              aria-live="polite"
+            >
+              {formData.notes.length}/{ENTRY_CONSTRAINTS.MAX_NOTES_LENGTH}
+            </span>
+          </div>
         </div>
       </div>
 

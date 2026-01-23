@@ -68,7 +68,7 @@ export const Toast = ({ message, type = 'info', duration = 4000, onClose }) => {
         <p className={`flex-1 text-sm font-medium ${colors.text}`}>{message}</p>
         <button
           onClick={handleClose}
-          className={`flex-shrink-0 p-1 rounded hover:bg-black/5 transition-colors ${colors.text}`}
+          className={`flex-shrink-0 p-2 rounded hover:bg-black/5 transition-colors ${colors.text}`}
           aria-label="Dismiss notification"
         >
           <X size={16} />
